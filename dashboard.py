@@ -22,8 +22,8 @@ st.set_page_config(
 # ==========================
 @st.cache_resource
 def load_models():
-    yolo_model = YOLO("model/best.pt")  # Model deteksi objek
-    classifier = tf.keras.models.load_model("model/classifier_model.h5")  # Model klasifikasi
+    yolo_model = YOLO("best.pt")
+    classifier = tf.keras.models.load_model("classifier_model.h5")
     return yolo_model, classifier
 
 yolo_model, classifier = load_models()
