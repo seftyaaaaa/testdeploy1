@@ -12,8 +12,8 @@ import io
 # ==========================
 @st.cache_resource
 def load_models():
-    yolo_model = YOLO("model/Seftya Pratista_Laporan 4.pt.pt")  # Model deteksi objek
-    classifier = tf.keras.models.load_model("model/Seftya Pratista_Laporan 2.h5")  # Model klasifikasi
+    yolo_model = YOLO("model_uts/Seftya Pratista_Laporan 4.pt.pt")  # Model deteksi objek
+    classifier = tf.keras.models.load_model("model_uts/Seftya Pratista_Laporan 2.h5")  # Model klasifikasi
     return yolo_model, classifier
 
 yolo_model, classifier = load_models()
