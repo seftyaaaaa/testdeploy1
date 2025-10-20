@@ -3,7 +3,7 @@ from ultralytics import YOLO
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import cv2
 
 # ==========================
@@ -27,24 +27,67 @@ menu = st.sidebar.selectbox("Pilih Mode:", ["Deteksi Objek (YOLO)", "Klasifikasi
 uploaded_file = st.file_uploader("Unggah Gambar", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
-    img = Image.open(uploaded_file)
+    img = Image.open(uploaded_file).convert("RGB")
     st.image(img, caption="Gambar yang Diupload", use_container_width=True)
 
+    # ==========================
+    # MODE DETEKSI OBJEK (YOLO)
+    # ==========================
     if menu == "Deteksi Objek (YOLO)":
-        # Deteksi objek
         results = yolo_model(img)
         result_img = results[0].plot()  # hasil deteksi (gambar dengan box)
-        st.image(result_img, caption="Hasil Deteksi", use_container_width=True)
 
+        # Konversi ke PIL untuk anotasi tambahan
+        annotated_img = Image.fromarray(cv2.cvtColor(result_img, cv2.COLOR_BGR2RGB))
+        draw = ImageDraw.Draw(annotated_img)
+
+        labels = [r.names[int(cls)] for cls in results[0].boxes.cls]
+
+        # Font untuk teks (gunakan default PIL agar aman)
+        try:
+            font = ImageFont.truetype("arial.ttf", 16)
+        except:
+            font = ImageFont.load_default()
+
+        # Tambahkan anotasi berdasarkan label
+        if any("forest" in label.lower() for label in labels):
+            quote = (
+                '"Di dalam hutan yang terdiri dari ribuan pohon, tak ada dua daun pun yang sama. '
+                'Dan tak ada dua perjalanan melewati jalur sama pun yang serupa."\n- Paulo Coelho'
+            )
+            draw.text((20, annotated_img.height - 80), quote, fill="white", font=font)
+
+        if any("desert" in label.lower() for label in labels):
+            desc = (
+                "Wilayah kering dengan curah hujan sangat rendah (kurang dari 250 mm per tahun), "
+                "suhu ekstrem (panas di siang hari dan dingin di malam hari), kelembapan rendah, "
+                "dan tanah tandus yang tidak mampu menyimpan air."
+            )
+            draw.text((20, annotated_img.height - 60), desc, fill="white", font=font)
+
+        st.image(annotated_img, caption="Hasil Deteksi dengan Anotasi", use_container_width=True)
+
+    # ==========================
+    # MODE KLASIFIKASI GAMBAR
+    # ==========================
     elif menu == "Klasifikasi Gambar":
-        # Preprocessing
-        img_resized = img.resize((224, 224))  # sesuaikan ukuran dengan model kamu
+        img_resized = img.resize((224, 224))
         img_array = image.img_to_array(img_resized)
-        img_array = np.expand_dims(img_array, axis=0)
-        img_array = img_array / 255.0
+        img_array = np.expand_dims(img_array, axis=0) / 255.0
 
-        # Prediksi
         prediction = classifier.predict(img_array)
         class_index = np.argmax(prediction)
-        st.write("### Hasil Prediksi:", class_index)
-        st.write("Probabilitas:", np.max(prediction))
+        confidence = np.max(prediction)
+
+        # Contoh label (sesuaikan dengan label model kamu)
+        labels = ["Sepatu Sport", "Sepatu Formal", "Sandal", "Boots"]
+        predicted_label = labels[class_index] if class_index < len(labels) else f"Label {class_index}"
+
+        st.write("### Hasil Prediksi:", predicted_label)
+        st.write(f"Probabilitas: **{confidence:.2f}**")
+
+        # Tambahan keterangan sepatu
+        st.info(
+            f"🛍️ Produk ini tersedia di **Matahari Department Store** "
+            f"dengan pilihan ukuran **35 hingga 42**."
+        )
