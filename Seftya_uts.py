@@ -41,7 +41,6 @@ menu = st.sidebar.radio(
     ["Deteksi Objek (YOLO)", "Klasifikasi Gambar"]
 )
 st.sidebar.info("‼️Upload gambar untuk memulai analisis AI‼️")
-)
 
 # ==========================
 # HEADER UTAMA
