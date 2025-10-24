@@ -7,7 +7,7 @@ from PIL import Image
 import cv2
 
 # ==========================
-# Konfigurasi Halaman
+# KONFIGURASI HALAMAN
 # ==========================
 st.set_page_config(
     page_title="AI Vision Dashboard - Seftya Pratista",
@@ -17,7 +17,7 @@ st.set_page_config(
 )
 
 # ==========================
-# Load Models
+# LOAD MODEL
 # ==========================
 @st.cache_resource
 def load_models():
@@ -28,25 +28,31 @@ def load_models():
 yolo_model, classifier = load_models()
 
 # ==========================
-# Daftar Label Kelas
+# DAFTAR LABEL KELAS
 # ==========================
 class_names = ["Ballet Flat", "Boat", "Brogue", "Clog", "Sneaker"]
 
 # ==========================
-# Sidebar
+# SIDEBAR NAVIGASI
 # ==========================
-st.sidebar.title("⚙️ Pengaturan")
-menu = st.sidebar.radio("Pilih Mode:", ["🎯 Deteksi Objek (YOLO)", "🧩 Klasifikasi Gambar"])
-st.sidebar.info("Unggah gambar di bawah untuk mulai analisis menggunakan model AI!")
+st.sidebar.title("⚙️ Pengaturan Dashboard")
+menu = st.sidebar.radio(
+    "Pilih Mode:",
+    ["🎯 Deteksi Objek (YOLO)", "🧩 Klasifikasi Gambar"]
+)
+st.sidebar.info("Unggah gambar di bawah untuk memulai analisis AI!")
 
 # ==========================
-# Header
+# HEADER UTAMA
 # ==========================
 st.title("🧠 AI Vision Dashboard")
 st.markdown("### *Deteksi Objek & Klasifikasi Gambar - Proyek UAS Seftya Pratista*")
 
 uploaded_file = st.file_uploader("📤 Unggah Gambar", type=["jpg", "jpeg", "png"])
 
+# ==========================
+# PROSES INPUT GAMBAR
+# ==========================
 if uploaded_file is not None:
     img = Image.open(uploaded_file).convert("RGB")
 
@@ -57,16 +63,20 @@ if uploaded_file is not None:
 
     with col2:
         if menu == "🎯 Deteksi Objek (YOLO)":
-            with st.spinner("🔍 Sedang mendeteksi objek..."):
+            with st.spinner("🔍 Sedang mendeteksi objek dengan YOLO..."):
                 results = yolo_model(img)
                 result_img = results[0].plot()
+
             st.image(result_img, caption="📦 Hasil Deteksi YOLO", use_container_width=True)
             st.success("✅ Deteksi selesai!")
 
         elif menu == "🧩 Klasifikasi Gambar":
             with st.spinner("🤖 Sedang mengklasifikasikan gambar..."):
-                # Preprocessing
-                img_resized = img.resize((224, 224))
+                # Ambil ukuran input model (otomatis)
+                target_size = classifier.input_shape[1:3]
+
+                # Preprocessing sesuai ukuran input model
+                img_resized = img.resize(target_size)
                 img_array = image.img_to_array(img_resized)
                 img_array = np.expand_dims(img_array, axis=0)
                 img_array = img_array / 255.0
@@ -77,26 +87,26 @@ if uploaded_file is not None:
                 confidence = np.max(prediction)
 
             # ==========================
-            # Tampilkan Hasil
+            # TAMPILKAN HASIL KLASIFIKASI
             # ==========================
-            st.subheader("📊 Hasil Prediksi")
-            st.metric(label="Prediksi", value=class_names[class_index])
+            st.subheader("📊 Hasil Prediksi Klasifikasi")
+            st.metric(label="Kategori Prediksi", value=class_names[class_index])
             st.progress(float(confidence))
             st.write(f"**Tingkat Keyakinan Model:** {confidence*100:.2f}%")
 
-            # Optional: tampilkan semua probabilitas
+            # Tampilkan semua probabilitas
             st.write("🔢 Probabilitas per kelas:")
             prob_dict = {class_names[i]: f"{prediction[0][i]*100:.2f}%" for i in range(len(class_names))}
             st.json(prob_dict)
 
 else:
-    st.info("👆 Silakan unggah gambar untuk memulai analisis.")
+    st.info("👆 Silakan unggah gambar terlebih dahulu untuk mulai deteksi atau klasifikasi.")
 
 # ==========================
-# Footer
+# FOOTER
 # ==========================
 st.markdown("---")
 st.markdown(
-    "<center>🚀 Dibuat dengan ❤️ oleh <b>Seftya Pratista</b> | Proyek UAS Kecerdasan Buatan</center>",
+    "<center>🚀 Dibuat dengan ❤️ oleh <b>Seftya Pratista</b><br>Proyek UAS Kecerdasan Buatan | Universitas Syiah Kuala</center>",
     unsafe_allow_html=True
 )
