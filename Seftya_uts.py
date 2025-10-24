@@ -10,8 +10,8 @@ import cv2
 # KONFIGURASI HALAMAN
 # ==========================
 st.set_page_config(
-    page_title="AI Vision Dashboard - Seftya Pratista",
-    page_icon="🧠",
+    page_title="Dashboard Klasifikasi dan Deteksi Objek",
+    page_icon="🔎",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -35,7 +35,7 @@ class_names = ["Ballet Flat", "Boat", "Brogue", "Clog", "Sneaker"]
 # ==========================
 # SIDEBAR NAVIGASI
 # ==========================
-st.sidebar.title("⚙️ Pengaturan Dashboard")
+st.sidebar.title("Pengaturan Dashboard")
 menu = st.sidebar.radio(
     "Pilih Mode:",
     ["🎯 Deteksi Objek (YOLO)", "🧩 Klasifikasi Gambar"]
