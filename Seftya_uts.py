@@ -4,13 +4,14 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 import numpy as np
 from PIL import Image
+import pandas as pd
 import cv2
 
 # ==========================
 # KONFIGURASI HALAMAN
 # ==========================
 st.set_page_config(
-    page_title="AI Vision Dashboard",
+    page_title="Dashboard Klasifikasi dan Deteksi Objek",
     page_icon="🔎",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -45,12 +46,9 @@ st.sidebar.info("📤 Unggah gambar sesuai mode yang dipilih untuk mulai analisi
 # ==========================
 # HEADER UTAMA
 # ==========================
-st.title("🔍 Dashboard Klasifikasi & Deteksi Objek")
-st.markdown("""
-Hai!! Selamat datang di dunia **AI Vision!**  
-Di sini kamu bisa lihat langsung bagaimana kecerdasan buatan bekerja mendeteksi dan mengklasifikasikan objek dari gambar.  
-Unggah fotomu, biarkan AI bekerja, dan saksikan bagaimana teknologi mengenali dunia di sekitarmu! 🔍🤩
-""")
+st.title("Dashboard Klasifikasi dan Deteksi Objek")
+st.markdown(""" Hai!! Selamat datang di dunia **AI Vision!** Di sini kamu bisa lihat langsung bagaimana kecerdasan buatan bekerja mendeteksi dan mengklasifikasikan objek dari gambar. 
+Unggah fotomu, biarkan AI bekerja, dan saksikan bagaimana teknologi mengenali dunia di sekitarmu! 🔍🤩 """)
 
 uploaded_file = st.file_uploader("📂 Unggah Gambar", type=["jpg", "jpeg", "png"])
 
@@ -68,19 +66,39 @@ if uploaded_file is not None:
     # MODE DETEKSI OBJEK (YOLO)
     # ==========================
     if menu == "Deteksi Objek (YOLO)":
-        with st.spinner("🚀 Sedang mendeteksi objek..."):
+        with st.spinner("🚀 AI sedang mendeteksi objek... harap tunggu sebentar!"):
             results = yolo_model(img)
             result_img = results[0].plot()
             boxes = results[0].boxes
 
-        if boxes is not None and len(boxes) > 0:
-            with col2:
+        with col2:
+            if boxes is not None and len(boxes) > 0:
                 st.image(result_img, caption="📦 Hasil Deteksi Objek", use_container_width=True)
                 st.success(f"✅ {len(boxes)} objek berhasil terdeteksi!")
-        else:
-            with col2:
+
+                # Buat tabel hasil deteksi
+                data = []
+                for box in boxes:
+                    xyxy = box.xyxy[0].tolist()
+                    conf = float(box.conf[0])
+                    cls = int(box.cls[0])
+                    data.append({
+                        "Label": results[0].names[cls],
+                        "Confidence": f"{conf*100:.2f}%",
+                        "x1": int(xyxy[0]),
+                        "y1": int(xyxy[1]),
+                        "x2": int(xyxy[2]),
+                        "y2": int(xyxy[3])
+                    })
+                
+                df = pd.DataFrame(data)
+                st.subheader("📋 Rincian Hasil Deteksi")
+                st.dataframe(df, use_container_width=True, hide_index=True)
+                
+                st.markdown("> 💡 Semakin tinggi nilai *confidence*, semakin yakin model terhadap deteksi tersebut.")
+            else:
                 st.warning("⚠️ Tidak ada objek yang terdeteksi dalam gambar ini.")
-                st.markdown("> Coba unggah gambar yang relevan untuk mode deteksi.")
+                st.markdown("> 🚫 Coba unggah gambar dengan objek yang lebih jelas atau berbeda sudut pandang.")
 
     # ==========================
     # MODE KLASIFIKASI GAMBAR
