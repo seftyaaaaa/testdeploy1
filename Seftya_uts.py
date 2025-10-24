@@ -4,8 +4,6 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 import numpy as np
 from PIL import Image
-import cv2
-from io import BytesIO
 import time
 
 # ==========================
@@ -23,8 +21,8 @@ st.set_page_config(
 # ==========================
 @st.cache_resource
 def load_models():
-    yolo_model = YOLO("model_uts/Seftya Pratista_Laporan 4.pt.pt")
-    classifier = tf.keras.models.load_model("model_uts/Seftya Pratista_Laporan 2.h5")
+    yolo_model = YOLO("model_uts/Seftya Pratista_Laporan 4.pt.pt")  # Model YOLO
+    classifier = tf.keras.models.load_model("model_uts/Seftya Pratista_Laporan 2.h5")  # Model klasifikasi
     return yolo_model, classifier
 
 yolo_model, classifier = load_models()
@@ -41,7 +39,7 @@ st.sidebar.image("model_uts/LOGO UUSK.jpg", use_container_width=True)
 st.sidebar.title("🔧 Pengaturan Dashboard")
 menu = st.sidebar.radio(
     "Pilih Mode:",
-    ["▶️Deteksi Objek (YOLO)", "▶️Klasifikasi Gambar"]
+    ["🎯 Deteksi Objek (YOLO)", "🧩 Klasifikasi Gambar"]
 )
 st.sidebar.info("Unggah gambar untuk mulai analisis AI!")
 
@@ -81,12 +79,8 @@ if uploaded_file is not None:
                 time.sleep(1)
 
             st.success(f"✅ Deteksi selesai! Ditemukan {len(detections)} objek.")
+            st.image(result_img, caption="📦 Hasil Deteksi YOLO", use_container_width=True)
 
-            # Tampilkan gambar hasil deteksi dengan efek transisi
-            placeholder = st.empty()
-            placeholder.image(result_img, caption="📦 Hasil Deteksi YOLO", use_container_width=True)
-
-            # Jika ada objek terdeteksi
             if len(detections) > 0:
                 st.markdown("### 📋 Rincian Hasil Deteksi")
                 det_table = []
