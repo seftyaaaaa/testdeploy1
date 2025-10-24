@@ -12,9 +12,10 @@ import time
 # KONFIGURASI HALAMAN
 # ==========================
 st.set_page_config(
-    page_title="Dashboard AI Vision",
-    page_icon="🤖",
-    layout="wide"
+    page_title="Dashboard Klasifikasi dan Deteksi Objek",
+    page_icon="🔎",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # ==========================
@@ -40,17 +41,18 @@ st.sidebar.image("model_uts/LOGO UUSK.jpg", use_container_width=True)
 st.sidebar.title("🔧 Pengaturan Dashboard")
 menu = st.sidebar.radio(
     "Pilih Mode:",
-    ["🎯 Deteksi Objek (YOLO)", "🧩 Klasifikasi Gambar"]
+    ["▶️Deteksi Objek (YOLO)", "▶️Klasifikasi Gambar"]
 )
 st.sidebar.info("Unggah gambar untuk mulai analisis AI!")
 
 # ==========================
 # JUDUL HALAMAN
 # ==========================
-st.title("🤖 Dashboard AI Vision")
+st.title("Dashboard Klasifikasi dan Deteksi Objek")
 st.markdown("""
-Selamat datang di **Dashboard AI Vision** —  
-tempat di mana kecerdasan buatan bekerja untuk mendeteksi dan mengenali objek dari gambar 🧠📸  
+Hai!! Selamat datang di dunia **AI Vision!**  
+Di sini kamu bisa lihat langsung bagaimana kecerdasan buatan bekerja mendeteksi dan mengklasifikasikan objek dari gambar.  
+Unggah fotomu, biarkan AI bekerja, dan saksikan bagaimana teknologi mengenali dunia di sekitarmu! 🔍🤩
 """)
 
 # ==========================
@@ -134,6 +136,6 @@ else:
 # ==========================
 st.markdown("---")
 st.markdown(
-    "<center>🧠 created by <b>Seftya Pratista | 2208108010054</b><br>Proyek UAS Praktikum Pemrograman Big Data | Universitas Syiah Kuala</center>",
+    "<center><b>Seftya Pratista | 2208108010054</b><br>Proyek UAS Praktikum Pemrograman Big Data | Universitas Syiah Kuala</center>",
     unsafe_allow_html=True
 )
