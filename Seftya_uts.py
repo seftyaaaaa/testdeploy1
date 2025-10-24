@@ -109,6 +109,6 @@ else:
 # ==========================
 st.markdown("---")
 st.markdown(
-    "<center>🚀 Dibuat dengan ❤️ oleh <b>Seftya Pratista</b><br>Proyek UAS Kecerdasan Buatan | Universitas Syiah Kuala</center>",
+    "<center> created by <b>Seftya Pratista | 2208108010054 </b><br>Proyek UAS Praktikum Pemograman Big Data| Universitas Syiah Kuala</center>",
     unsafe_allow_html=True
 )
