@@ -12,8 +12,8 @@ import cv2
 @st.cache_resource
 def load_models():
     # Pastikan path sesuai dengan nama file kamu di folder model_uts
-    yolo_model = YOLO("model_uts/Seftya_Pratista_Laporan_4.pt")   # Model YOLO (.pt)
-    classifier = tf.keras.models.load_model("model_uts/Seftya_Pratista_2.h5")  # Model Klasifikasi (.h5)
+    yolo_model = YOLO("model_uts/Seftya Pratista_Laporan 4.pt.pt")   # Model YOLO (.pt)
+    classifier = tf.keras.models.load_model("model_uts/Seftya Pratista_Laporan 2.h5")  # Model Klasifikasi (.h5)
     return yolo_model, classifier
 
 yolo_model, classifier = load_models()
