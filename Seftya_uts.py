@@ -35,18 +35,21 @@ class_names = ["Ballet Flat", "Boat", "Brogue", "Clog", "Sneaker"]
 # ==========================
 # SIDEBAR NAVIGASI
 # ==========================
-st.sidebar.title("Pengaturan Dashboard")
+st.sidebar.image("model_uts/LOGO UUSK.jpg", use_container_width=True)
 menu = st.sidebar.radio(
     "Pilih Mode:",
-    ["🎯 Deteksi Objek (YOLO)", "🧩 Klasifikasi Gambar"]
+    ["Deteksi Objek (YOLO)", "Klasifikasi Gambar"]
 )
-st.sidebar.info("Unggah gambar di bawah untuk memulai analisis AI!")
+st.sidebar.info("‼️Upload gambar untuk memulai analisis AI‼️")
+)
 
 # ==========================
 # HEADER UTAMA
 # ==========================
-st.title("🧠 AI Vision Dashboard")
-st.markdown("### *Deteksi Objek & Klasifikasi Gambar - Proyek UAS Seftya Pratista*")
+st.title("Dashboard Klasifikasi dan Deteksi Objek")
+st.markdown("""Hai!! Selamat datang di dunia **AI Vision!** Di sini kamu bisa lihat langsung bagaimana kecerdasan
+buatan bekerja mendeteksi dan mengklasifikasikan objek dari gambar.  
+Unggah fotomu, biarkan AI bekerja, dan saksikan bagaimana teknologi mengenali dunia di sekitamu! 🔍🤩""")
 
 uploaded_file = st.file_uploader("📤 Unggah Gambar", type=["jpg", "jpeg", "png"])
 
@@ -62,7 +65,7 @@ if uploaded_file is not None:
         st.image(img, caption="🖼️ Gambar yang Diupload", use_container_width=True)
 
     with col2:
-        if menu == "🎯 Deteksi Objek (YOLO)":
+        if menu == "Deteksi Objek (YOLO)":
             with st.spinner("🔍 Sedang mendeteksi objek dengan YOLO..."):
                 results = yolo_model(img)
                 result_img = results[0].plot()
