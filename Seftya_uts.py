@@ -142,10 +142,6 @@ if 'last_conf' not in st.session_state:
 # ==========================
 @st.cache_resource
 def load_models():
-    from torch.serialization import add_safe_globals
-    from ultralytics.nn.tasks import DetectionModel
-
-    add_safe_globals([DetectionModel])  # penting di PyTorch 2.6+
     yolo_model = YOLO("model_uts/Seftya Pratista_Laporan 4.pt.pt")
     classifier = tf.keras.models.load_model("model_uts/Seftya Pratista_Laporan 2.h5")
     return yolo_model, classifier
