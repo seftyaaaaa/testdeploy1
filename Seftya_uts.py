@@ -7,7 +7,8 @@ from PIL import Image
 import pandas as pd
 import cv2
 import datetime
-import torch  # 🔹 diperlukan untuk patch load model
+import torch
+import os
 
 # ==========================
 # CONFIG
@@ -119,36 +120,48 @@ for key, val in {
 @st.cache_resource
 def load_models():
     try:
-        import torch
         from ultralytics.nn.tasks import DetectionModel
-
-        # 🔹 Izinkan class DetectionModel dikenali saat deserialisasi
         torch.serialization.add_safe_globals([DetectionModel])
 
-        # 🔹 Patch fungsi torch.load agar mengizinkan load model lama
+        # Cek keberadaan file model
+        deteksi_path = "model_uts/deteksi.pt"
+        klasifikasi_path = "model_uts/klasifikasi.h5"
+
+        if not os.path.exists(deteksi_path):
+            st.error("❌ File model deteksi tidak ditemukan. Pastikan 'model_uts/deteksi.pt' ada.")
+            return None, None
+        if not os.path.exists(klasifikasi_path):
+            st.error("❌ File model klasifikasi tidak ditemukan. Pastikan 'model_uts/klasifikasi.h5' ada.")
+            return None, None
+
+        # Patch torch.load untuk kompatibilitas PyTorch 2.6
+        original_torch_load = torch.load
+
         def patched_torch_load(*args, **kwargs):
-            # Pastikan weights_only=False agar model lama bisa dibuka
             kwargs["weights_only"] = False
             return original_torch_load(*args, **kwargs)
 
-        # Simpan fungsi asli, lalu patch sementara
-        original_torch_load = torch.load
         torch.load = patched_torch_load
 
-        # 🔹 Load YOLO model
-        yolo_model = YOLO("model_uts/deteksi.pt")
+        try:
+            yolo_model = YOLO(deteksi_path)
+        except Exception as e:
+            raise RuntimeError(f"Model YOLO gagal dimuat. Kemungkinan file rusak: {e}")
 
-        # 🔹 Kembalikan fungsi torch.load ke versi asli (demi keamanan)
-        torch.load = original_torch_load
+        torch.load = original_torch_load  # Kembalikan fungsi torch.load
 
-        # 🔹 Load model klasifikasi (CNN)
-        classifier = tf.keras.models.load_model("model_uts/klasifikasi.h5")
+        try:
+            classifier = tf.keras.models.load_model(klasifikasi_path)
+        except Exception as e:
+            raise RuntimeError(f"Model klasifikasi gagal dimuat: {e}")
 
+        st.success("✅ Model berhasil dimuat dan siap digunakan!")
         return yolo_model, classifier
 
     except Exception as e:
         st.error(f"Gagal memuat model: {e}")
         return None, None
+
 
 yolo_model, classifier = load_models()
 
@@ -167,6 +180,7 @@ def halaman_awal():
     if st.button("Lanjut ke Registrasi →"):
         st.session_state['page'] = 'register'
 
+
 def halaman_registrasi():
     st.markdown('<div class="main-title">📝 Registrasi Singkat</div>', unsafe_allow_html=True)
     with st.form("form_reg"):
@@ -184,11 +198,10 @@ def halaman_registrasi():
     if st.button("⬅️ Kembali ke Halaman Awal"):
         st.session_state['page'] = 'home'
 
-from plotly import express as px
 
 def halaman_main():
     st.sidebar.image("model_uts/LOGO UUSK.jpg", use_container_width=True)
-    menu = st.sidebar.radio("🧭 Pilih Mode Analisis:", ["Deteksi Objek (YOLO)", "Klasifikasi Gambar"]) 
+    menu = st.sidebar.radio("🧭 Pilih Mode Analisis:", ["Deteksi Objek (YOLO)", "Klasifikasi Gambar"])
     uploaded_file = st.file_uploader("📂 Unggah Gambar", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
@@ -230,14 +243,14 @@ def halaman_main():
                 with col2:
                     st.subheader("📊 Hasil Klasifikasi")
                     st.metric("Kategori Prediksi", class_names[class_index])
-                    st.progress(confidence/100.0)
+                    st.progress(confidence / 100.0)
                     st.write(f"**Tingkat Keyakinan Model:** {confidence:.2f}%")
-
     else:
         st.info("👆 Silakan unggah gambar terlebih dahulu.")
 
     if st.button("⬅️ Kembali ke Registrasi"):
         st.session_state['page'] = 'register'
+
 
 # ==========================
 # ROUTING
@@ -253,4 +266,7 @@ elif st.session_state['page'] == 'main':
 # FOOTER
 # ==========================
 st.markdown("---")
-st.markdown("<center>created by <b>Seftya Pratista | 2208108010054</b><br>Proyek UAS Praktikum Pemrograman Big Data | Universitas Syiah Kuala</center>", unsafe_allow_html=True)
+st.markdown(
+    "<center>created by <b>Seftya Pratista | 2208108010054</b><br>Proyek UAS Praktikum Pemrograman Big Data | Universitas Syiah Kuala</center>",
+    unsafe_allow_html=True
+)
