@@ -136,13 +136,13 @@ def load_models():
         torch.load = patched_torch_load
 
         # 🔹 Load YOLO model
-        yolo_model = YOLO("model_uts/SeftyaPratista_Laporan4.pt")
+        yolo_model = YOLO("model_uts/deteksi.pt")
 
         # 🔹 Kembalikan fungsi torch.load ke versi asli (demi keamanan)
         torch.load = original_torch_load
 
         # 🔹 Load model klasifikasi (CNN)
-        classifier = tf.keras.models.load_model("model_uts/SeftyaPratista_Laporan2.h5")
+        classifier = tf.keras.models.load_model("model_uts/klasifikasi.h5")
 
         return yolo_model, classifier
 
