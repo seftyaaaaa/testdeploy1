@@ -142,7 +142,7 @@ if 'last_conf' not in st.session_state:
 # ==========================
 @st.cache_resource
 def load_models():
-    yolo_model = YOLO("model_uts/Seftya Pratista_Laporan 4.pt.pt.pt")
+    yolo_model = YOLO("model_uts/Seftya Pratista_Laporan 4.pt.pt")
     classifier = tf.keras.models.load_model("model_uts/Seftya Pratista_Laporan 2.h5")
     return yolo_model, classifier
 
