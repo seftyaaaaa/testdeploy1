@@ -142,30 +142,10 @@ if 'last_conf' not in st.session_state:
 # ==========================
 @st.cache_resource
 def load_models():
-    import torch
-    from torch.serialization import add_safe_globals
-    from ultralytics.nn.tasks import DetectionModel
-    from ultralytics import YOLO
-
-    # Izinkan global class DetectionModel
-    add_safe_globals([DetectionModel])
-
-    # Load model YOLO secara manual dengan weights_only=False
-    model_path = "model_uts/Seftya Pratista_Laporan 4.pt.pt"
-
-    with open(model_path, "rb") as f:
-        yolo_weights = torch.load(f, weights_only=False)  # override default behavior
-
-    # Inisialisasi model YOLO dengan weights yang sudah di-load
-    yolo_model = YOLO()
-    yolo_model.model = yolo_weights
-
-    # Load model CNN klasifikasi
-    import tensorflow as tf
+    yolo_model = YOLO("model_uts/Seftya Pratista_Laporan 4.pt.pt.pt")
     classifier = tf.keras.models.load_model("model_uts/Seftya Pratista_Laporan 2.h5")
-
     return yolo_model, classifier
-    
+
 # attempt load, but catch errors to keep app responsive
 try:
     yolo_model, classifier = load_models()
