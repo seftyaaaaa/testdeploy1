@@ -119,12 +119,31 @@ for key, val in {
 @st.cache_resource
 def load_models():
     try:
-        # 🔹 Patch agar YOLO .pt bisa di-load di PyTorch >=2.6
+        import torch
         from ultralytics.nn.tasks import DetectionModel
+
+        # 🔹 Izinkan class DetectionModel dikenali saat deserialisasi
         torch.serialization.add_safe_globals([DetectionModel])
 
+        # 🔹 Patch fungsi torch.load agar mengizinkan load model lama
+        def patched_torch_load(*args, **kwargs):
+            # Pastikan weights_only=False agar model lama bisa dibuka
+            kwargs["weights_only"] = False
+            return original_torch_load(*args, **kwargs)
+
+        # Simpan fungsi asli, lalu patch sementara
+        original_torch_load = torch.load
+        torch.load = patched_torch_load
+
+        # 🔹 Load YOLO model
         yolo_model = YOLO("model_uts/SeftyaPratista_Laporan4.pt")
+
+        # 🔹 Kembalikan fungsi torch.load ke versi asli (demi keamanan)
+        torch.load = original_torch_load
+
+        # 🔹 Load model klasifikasi (CNN)
         classifier = tf.keras.models.load_model("model_uts/SeftyaPratista_Laporan2.h5")
+
         return yolo_model, classifier
 
     except Exception as e:
